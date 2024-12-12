@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "luca"
+dynamic = ["version"]
+requires-python = ">=3.11"
+dependencies = [
+    'click',
+    'click-option-group',
+    'numpy',
+    'pydantic',
+    'pysam',
+    'python-magic',
+    'pyyaml'
+]
+
+[project.scripts]
+luca = "luca.main:main"

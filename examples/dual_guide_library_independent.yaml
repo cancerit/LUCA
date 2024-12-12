@@ -1,0 +1,27 @@
+# Dual-guide paired-end (library-independent)
+sequencing_type: paired_end
+
+# Quantify read 1 and 2 separately
+# (single region, length unspecified, per read)
+read_templates:
+  - id: forward
+    regions:
+      - id: guide
+  - id: reverse
+    regions:
+      - id: guide
+
+read_group_templates:
+  read_1:
+    - forward
+  read_2:
+    - reverse
+
+# Quantify the combinations of the regions
+combinations:
+  - id: guides
+    regions:
+      - id: guide
+        read_group: read_1
+      - id: guide
+        read_group: read_2
