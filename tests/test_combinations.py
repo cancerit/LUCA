@@ -1,6 +1,6 @@
 # LUCA
 #
-# Copyright (C) 2024 Genome Research Ltd.
+# Copyright (C) 2024, 2025 Genome Research Ltd.
 #
 # Author: Luca Barbon
 #
@@ -74,6 +74,8 @@ def test_non_combinatorial_combination_rules():
     cr = NCCombinationRules({}, combinations)
     c = cr.get_counter()
     assert len(c) == 2
+    for v in c.values():
+        assert v == 0
     for combination in combinations:
         assert combination in c
         assert cr.should_count_combination(combination)

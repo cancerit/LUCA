@@ -1,6 +1,6 @@
 # LUCA
 #
-# Copyright (C) 2024 Genome Research Ltd.
+# Copyright (C) 2024, 2025 Genome Research Ltd.
 #
 # Author: Luca Barbon
 #
@@ -672,7 +672,7 @@ class NCCombinationRules(BaseCombinationRules):
         return combination in self.combinations
 
     def get_counter(self) -> Counter:
-        return Counter(self.combinations)
+        return Counter({k: 0 for k in self.combinations})
 
 
 @dataclass
