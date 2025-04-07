@@ -672,7 +672,7 @@ class NCCombinationRules(BaseCombinationRules):
         return combination in self.combinations
 
     def get_counter(self) -> Counter:
-        return Counter(self.combinations)
+        return Counter({k: 0 for k in self.combinations})
 
 
 @dataclass
