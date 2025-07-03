@@ -10,6 +10,6 @@ echo "$(python --version)"
 echo "Package source directory: ${PKG_DIR}"
 
 pip install \
-    pytest==8.2.2 \
-    pytest-cov==5.0.0 && \
+    pytest==8.4.1 \
+    pytest-cov==6.2.1 && \
 pytest --cov="${PKG_DIR}" "${TEST_DIR}"
