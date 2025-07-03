@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.2] - 2025-07-03
+
+### Fixed
+
+- Fix library stats serialisation for NumPy 2.3.*
+
 ## [1.0.1] - 2025-04-07
 
 ### Fixed
