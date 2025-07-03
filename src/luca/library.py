@@ -535,12 +535,12 @@ def fill_library_stats(stats: LibraryStats, template_counts: np.ndarray) -> None
 
     # Count templates with low read counts
     # TODO: take better advantage of the sorting...?
-    low_counts[0] = np.count_nonzero(template_counts == 0)
+    low_counts[0] = int(np.count_nonzero(template_counts == 0))
     count_thresholds: list[int] = [15, 30]
     # if opt.custom_count_threshold is not None:
     #     count_thresholds.append(opt.custom_count_threshold)
     for t in count_thresholds:
-        low_counts[t] = np.count_nonzero(template_counts < t)
+        low_counts[t] = int(np.count_nonzero(template_counts < t))
 
     # Generate all stats
     mapped_to_template_reads, mean_count_per_template, median_count_per_template, gini_coefficient = get_stats(
