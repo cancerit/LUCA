@@ -16,5 +16,12 @@ dependencies = [
     'pyyaml==6.0.2'
 ]
 
+[project.optional-dependencies]
+test = [
+    'pytest==8.4.1',
+    'pytest-cov==6.2.1',
+    'pycodestyle==2.14.0'
+]
+
 [project.scripts]
 luca = "luca.main:main"
