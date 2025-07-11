@@ -438,6 +438,15 @@ class Experiment(BaseConfig):
                     }
 
                     for cr in self.combinations:
+                        read_group_ids: set[ReadGroupId] = {
+                            region.read_group
+                            for region in cr.regions
+                        }
+                        for id in read_group_ids:
+                            if id not in self.read_group_templates:
+                                logging.error("Read group '%s' in combination '%s' not assigned to any read template!" % (id.value, cr.id))
+                                success = False
+
                         filtered_region_ids = set([
                             region.id
                             for region in cr.filtered_regions
