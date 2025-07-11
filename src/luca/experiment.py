@@ -1,6 +1,6 @@
 # LUCA
 #
-# Copyright (C) 2024 Genome Research Ltd.
+# Copyright (C) 2024, 2025 Genome Research Ltd.
 #
 # Author: Luca Barbon
 #
@@ -23,7 +23,7 @@ from enum import Enum, IntEnum
 from itertools import chain, groupby
 from typing import Any
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .errors import InvalidExperiment
 from .utils import eval_fail_conditions, get_offsets, get_set, greedy_all, greedy_any, has_duplicates, union
@@ -49,7 +49,11 @@ class LibraryReverseCondition(Enum):
     NEVER = 'never'
 
 
-class LibraryInfo(BaseModel):
+class BaseConfig(BaseModel, validate_assignment=True):
+    model_config = ConfigDict(extra='forbid')  # noqa: F841
+
+
+class LibraryInfo(BaseConfig):
     id: str
     values: list[str] | None = None
     reverse_on: LibraryReverseCondition = LibraryReverseCondition.REVERSE_GROUP
@@ -59,7 +63,7 @@ class LibraryInfo(BaseModel):
         return not bool(self.values)
 
 
-class ReadRegion(BaseModel):
+class ReadRegion(BaseConfig):
     id: str
     libraries: list[str] = list()
     skip: int = 0
@@ -125,7 +129,7 @@ class Anchor(Enum):
 CombinationRegionIndices = dict[ReadGroupId, list[dict[str, int]]]
 
 
-class ReadTemplate(BaseModel):
+class ReadTemplate(BaseConfig):
     #  NOTE: Have reverse complement be a property
     #   of the template, for maximum flexibility
     #  (when both orientation are to be evaluated);
@@ -168,11 +172,11 @@ class ReadTemplate(BaseModel):
         return greedy_all(lambda x: x.validate(self.id), self.regions)
 
 
-class ReadGroupOptions(BaseModel):
+class ReadGroupOptions(BaseConfig):
     is_reverse: bool
 
 
-class ReadGroupInfo(BaseModel):
+class ReadGroupInfo(BaseConfig):
     """
     Information to classify reads in order to match them to templates
 
@@ -187,7 +191,7 @@ class ReadGroupInfo(BaseModel):
         self.is_reverse = opt.is_reverse
 
 
-class CombinationRegion(BaseModel):
+class CombinationRegion(BaseConfig):
     id: str
     read_group: ReadGroupId = ReadGroupId.DEFAULT
     filter: bool = False
@@ -200,7 +204,7 @@ class CombinationRegion(BaseModel):
         )
 
 
-class CombinationInfo(BaseModel):
+class CombinationInfo(BaseConfig):
     id: str
     regions: list[CombinationRegion]
     filters: list[str] | None = None
@@ -284,7 +288,7 @@ READ_GROUP_INFOS = {
 }
 
 
-class Options(BaseModel):
+class Options(BaseConfig):
     """
     Runtime options
 
@@ -339,7 +343,7 @@ def get_unique_library_ids_from_read_templates(read_templates: list[ReadTemplate
     return union(library_ids) if library_ids else set()
 
 
-class Experiment(BaseModel):
+class Experiment(BaseConfig):
     # TODO: include species and assembly?
     sequencing_type: SequencingType
     libraries: list[LibraryInfo] = Field(default_factory=list)

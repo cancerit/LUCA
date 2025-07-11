@@ -6,6 +6,10 @@
 
 - Fix library stats serialisation for NumPy 2.3.*
 
+### Changed
+
+- Forbid extra attributes in the experiment configuration
+
 ## [1.0.1] - 2025-04-07
 
 ### Fixed
