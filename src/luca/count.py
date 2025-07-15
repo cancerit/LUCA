@@ -45,6 +45,7 @@ from .matcher import ExperimentStats, MultiMatcher, get_multi_matcher
 from .path_bundle import PathBundle
 from .readers.main import parse_reads
 from .readers.read_file_info import ReadFileInfo
+from .readers.tsv import TsvError
 from .stats import LibraryIndependentStats
 from .utils import load_text_from_file, log_validation_error
 from .writer import write_stats
@@ -94,6 +95,8 @@ def load_matcher(exp: Experiment, pb: PathBundle) -> MultiMatcher:
         abort("File not found: '%s'!", ex.filename or ex.args[0])
     except InvalidLibraryError as ex:
         abort(ex.message)
+    except TsvError as ex:
+        abort("Invalid TSV file: '%s'!" % ex.fp)
 
 
 def library_dependent_counting(exp: Experiment, opt: Options, pb: PathBundle, iter_reads, profile: bool = False) -> tuple[LibraryIndependentStats, ExperimentStats]:
@@ -358,6 +361,9 @@ def count(
     except InvalidHTSError as ex:
         logging.error(ex.message)
         sys.exit(1)
+
+    except TsvError as ex:
+        abort("Invalid TSV file: '%s'!" % ex.fp)
 
     # Write stats to file
     assert stats
