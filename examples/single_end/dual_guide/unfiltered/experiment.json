@@ -1,0 +1,36 @@
+{
+    "sequencing_type": "single_end",
+    "read_group_templates": {
+        "default": ["default"]
+    },
+    "libraries": [
+        {"id": "guide_1_library"},
+        {"id": "guide_2_library"}
+    ],
+    "read_templates": [
+        {
+            "id": "default",
+            "regions": [
+                {
+                    "id": "guide_1",
+                    "libraries": ["guide_1_library"]
+                },
+                {
+                    "id": "guide_2",
+                    "libraries": ["guide_2_library"]
+                }
+            ]
+        }
+    ],
+    "combinations": [
+        {
+            "id": "guides",
+            "regions": [
+                {"id": "guide_1", "filter": false},
+                {"id": "guide_2", "filter": false}
+            ],
+            "filters": []
+        }
+    ],
+    "default_options": {}
+}

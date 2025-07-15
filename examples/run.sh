@@ -1,0 +1,49 @@
+#!/bin/bash
+
+LIBRARY_DIR=libraries
+SEED=32167
+READS=1000
+
+set -e
+
+for fp in $(find . -name "experiment.json"); do
+	dir=$(dirname $fp)
+	data_fp="${dir}/data.bam"
+
+	if [ ! -f $data_fp ]; then
+		is_new=1
+
+		printf "Generating test data in ${dir}...\n"
+		../scripts/generate_test_data.py \
+			-o ${data_fp} \
+			-s ${SEED} \
+			-n ${READS} \
+			-l ${LIBRARY_DIR} \
+			-m ${LIBRARY_DIR}/manifest.json \
+			${fp}
+
+	else
+		is_new=0
+	fi
+
+	# Prepare output directory
+	out_dir="${dir}/output"
+	mkdir -p $out_dir
+
+	printf "Testing ${dir}...\n"
+	luca count \
+		-l ${LIBRARY_DIR} \
+		-o ${out_dir} \
+		-s SAMPLE \
+		${fp} \
+		${data_fp}
+
+	if [ "${is_new}" -eq "1" ]; then
+		md5sum ${out_dir}/* > "${dir}/output.md5"
+	else
+		md5sum -c "${dir}/output.md5" ${out_dir}
+	fi
+
+done
+
+set +e

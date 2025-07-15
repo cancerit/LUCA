@@ -1,0 +1,9 @@
+{
+    "libraries": {
+        "guide_1_library": "library_1.tsv",
+        "guide_2_library": "library_2.tsv"
+    },
+    "combination_filters": {
+        "single_end_dual_guide_pair_filter": "single_end_dual_guide_pair_filter.tsv"
+    }
+}
