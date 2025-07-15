@@ -27,7 +27,9 @@ import click
 import yaml
 from click_option_group import OptionGroup
 from pydantic import ValidationError
+from yaml.parser import ParserError
 from yaml.scanner import ScannerError
+from yaml.error import Mark
 
 from . import __version__
 from .app_info import AppInfo
@@ -261,6 +263,9 @@ def count(
         except ScannerError as ex:
             m = ex.problem_mark
             abort(f"YAML parsing error: {ex.problem} at line {m.line} column {m.column} in {m.name}!")  # type: ignore
+        except ParserError as ex:
+            logging.error(str(ex).replace('\n', ''))
+            abort("Failed to load experiment configuration!")
         except ValidationError as ex:
             log_validation_error(ex)
             abort("Failed to load experiment configuration!")
