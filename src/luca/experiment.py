@@ -84,7 +84,18 @@ class ReadRegion(BaseConfig):
             "Invalid read region '%s' in read template '%s': %s!" %
             (self.id, tpl_id, msg))
 
-    def validate(self, tpl_id: str) -> bool:
+    def validate_libraries(self, library_ids: set[str]) -> bool:
+        region_libraries: set[str] = set(self.libraries) | set(self.swap_libraries)
+        missing_libraries: set[str] = region_libraries - library_ids
+        if missing_libraries:
+            for library_id in missing_libraries:
+                logging.error(
+                    "Unknown library ID in region '%s': '%s'!" %
+                    (self.id, library_id))
+            return False
+        return True
+
+    def validate(self, library_ids: set[str], tpl_id: str) -> bool:
         return eval_fail_conditions([
             (
                 (self.is_library_indep and bool(self.swap_libraries)),
@@ -97,6 +108,10 @@ class ReadRegion(BaseConfig):
             (
                 ((self.length is not None or self.is_library_indep) and self.max_offset != 0),
                 "library-independent quantification does not support a nonzero maximum offset"
+            ),
+            (
+                (not self.validate_libraries(library_ids)),
+                "unknown library ID's"
             )
         ], lambda msg: self._raise_invalid_region(tpl_id, msg))
 
@@ -168,8 +183,8 @@ class ReadTemplate(BaseConfig):
     def get_region_indices(self, offset: int = 0) -> dict[str, int]:
         return {r.id: offset + i for i, r in enumerate(self.regions)}
 
-    def validate(self) -> bool:
-        return greedy_all(lambda x: x.validate(self.id), self.regions)
+    def validate(self, library_ids: set[str]) -> bool:
+        return greedy_all(lambda x: x.validate(library_ids, self.id), self.regions)
 
 
 class ReadGroupOptions(BaseConfig):
@@ -371,6 +386,10 @@ class Experiment(BaseConfig):
     def template_ids(self) -> list[str]:
         return [tpl.id for tpl in self.read_templates]
 
+    @property
+    def library_ids(self) -> set[str]:
+        return {library.id for library in self.libraries}
+
     @model_validator(mode='after')
     def _validate(self):
         success = True
@@ -398,7 +417,7 @@ class Experiment(BaseConfig):
                 if had_duplicates:
                     success = False
 
-                if not greedy_all(lambda x: x.validate(), self.read_templates):
+                if not greedy_all(lambda x: x.validate(self.library_ids), self.read_templates):
                     success = False
 
                 if self.read_group_templates:
