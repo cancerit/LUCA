@@ -1,10 +1,11 @@
 # Changelog
 
-## [1.0.2] - 2025-07-03
+## [1.0.2] - 2025-07-15
 
 ### Fixed
 
 - Fix library stats serialisation for NumPy 2.3.*
+- Handle input manifest failed look-ups
 
 ### Changed
 
