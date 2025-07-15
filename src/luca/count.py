@@ -1,6 +1,6 @@
 # LUCA
 #
-# Copyright (C) 2023, 2024 Genome Research Ltd.
+# Copyright (C) 2023, 2024, 2025 Genome Research Ltd.
 #
 # Author: Luca Barbon
 #
@@ -29,7 +29,6 @@ from click_option_group import OptionGroup
 from pydantic import ValidationError
 from yaml.parser import ParserError
 from yaml.scanner import ScannerError
-from yaml.error import Mark
 
 from . import __version__
 from .app_info import AppInfo
