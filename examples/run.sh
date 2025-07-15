@@ -40,6 +40,7 @@ for fp in $(find . -name "experiment.json"); do
 
 	if [ "${is_new}" -eq "1" ]; then
 		md5sum ${out_dir}/* > "${dir}/output.md5"
+		mv -v "${out_dir}" "${out_dir}_exp"
 	else
 		md5sum -c "${dir}/output.md5" ${out_dir}
 	fi
