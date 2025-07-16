@@ -4,6 +4,7 @@
         "guide_2_library": "library_2.tsv"
     },
     "combination_filters": {
-        "single_end_dual_guide_pair_filter": "single_end_dual_guide_pair_filter.tsv"
+        "single_end_dual_guide_pair_filter": "single_end_dual_guide_pair_filter.tsv",
+        "paired_end_dual_guide_pair_filter": "paired_end_dual_guide_pair_filter.tsv"
     }
 }
