@@ -3,6 +3,7 @@
 LIBRARY_DIR=libraries
 SEED=32167
 READS=1000
+MISMATCH_FRACTION=0.05  # [0.0, 1.0]
 
 set -e
 
@@ -18,6 +19,7 @@ for fp in $(find . -name "experiment.json"); do
 			-o ${data_fp} \
 			-s ${SEED} \
 			-n ${READS} \
+			-M ${MISMATCH_FRACTION} \
 			-l ${LIBRARY_DIR} \
 			-m ${LIBRARY_DIR}/manifest.json \
 			${fp}

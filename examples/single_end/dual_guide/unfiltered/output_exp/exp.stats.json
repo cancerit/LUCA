@@ -1,1 +1,1 @@
-{"version": "1.0.2", "command": "luca count -l libraries -o ./single_end/dual_guide/unfiltered/output -s SAMPLE ./single_end/dual_guide/unfiltered/experiment.json ./single_end/dual_guide/unfiltered/data.bam", "read_match": 1000, "read_swap": 0, "read_mismatch": 0, "pair_one_end_match": 0}
+{"version": "1.0.2", "command": "luca count -l libraries -o ./single_end/dual_guide/unfiltered/output -s SAMPLE ./single_end/dual_guide/unfiltered/experiment.json ./single_end/dual_guide/unfiltered/data.bam", "read_match": 950, "read_swap": 0, "read_mismatch": 50, "pair_one_end_match": 0}

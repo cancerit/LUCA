@@ -1,1 +1,1 @@
-{"mapped_to_template_reads": 1000, "mean_count_per_template": 100.0, "median_count_per_template": 99.5, "total_templates": 10, "swap_matching_reads": 0, "zero_count_templates": 0, "low_count_templates_lt_15": 0, "low_count_templates_lt_30": 0, "gini_coefficient": 0.05}
+{"mapped_to_template_reads": 954, "mean_count_per_template": 95.4, "median_count_per_template": 95.5, "total_templates": 10, "swap_matching_reads": 0, "zero_count_templates": 0, "low_count_templates_lt_15": 0, "low_count_templates_lt_30": 0, "gini_coefficient": 0.05}
