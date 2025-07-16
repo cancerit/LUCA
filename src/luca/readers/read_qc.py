@@ -1,6 +1,6 @@
 # LUCA
 #
-# Copyright (C) 2023 Genome Research Ltd.
+# Copyright (C) 2023, 2025 Genome Research Ltd.
 #
 # Author: Luca Barbon
 #
@@ -21,7 +21,7 @@ import re
 
 NT_UC = 'ACGT'
 NT_LC = NT_UC.lower()
-AMB_NT_UC = 'NRYKMSW'
+AMB_NT_UC = 'WSMKRYBDHVNZ'
 AMB_NT_LC = AMB_NT_UC.lower()
 
 
