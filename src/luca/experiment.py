@@ -473,8 +473,8 @@ class Experiment(BaseConfig):
                         if cr.has_filter:
                             if not filtered_region_ids:
                                 logging.error(
-                                    "Combination %s has inclusion filters assigned to it " +
-                                    "but none of its regions are marked as filtering!" % cr.id)
+                                    "Combination %s has inclusion filters assigned to it " % cr.id +
+                                    "but none of its regions are marked as filtering!")
                                 success = False
                         else:
                             if filtered_region_ids:
