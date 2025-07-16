@@ -47,6 +47,7 @@ from luca.experiment import (
 from luca.library import LibraryBuilder, RawLibrary
 from luca.matcher import load_library
 from luca.path_bundle import PathBundle
+from luca.readers.read_qc import AMB_NT_UC, NT_UC
 from luca.readers.tsv import TsvError
 from luca.utils import log_validation_error
 
@@ -55,6 +56,7 @@ from luca.utils import log_validation_error
 class DataGenOpt:
     read_number: int
     read_length: int
+    read_mismatch_fraction: float
 
 
 # FROM MultiMatcher.from_experiment
@@ -96,6 +98,10 @@ def load_path_bundle(exp: Experiment, output: str, library_dir: str | None, inpu
     return pb
 
 
+def get_ambiguous_sequence(k: int) -> str:
+    return ''.join(random.choices(AMB_NT_UC, k=k))
+
+
 @dataclass(slots=True)
 class GenRegion:
     prefix: str
@@ -111,7 +117,7 @@ class GenRegion:
             i = random.choice(range(len(self.libraries)))
             return self.prefix + random.choice(self.libraries[i].sequences)
         else:
-            return self.prefix + ''.join(random.choices('ACGT', k=self.length))
+            return self.prefix + ''.join(random.choices(NT_UC, k=self.length))
 
 
 def get_region_max_length(region: ReadRegion, library_indices: dict[str, int], lb: LibraryBuilder) -> int:
@@ -182,6 +188,8 @@ def generate_single_end(exp: Experiment, opt: DataGenOpt, lb: LibraryBuilder, sa
     for i in range(opt.read_number):
         read.query_sequence = get_read_sequence(regions)
         read.template_length = len(read.query_sequence)
+        if opt.read_mismatch_fraction > 0.0 and random.random() < opt.read_mismatch_fraction:
+            read.query_sequence = get_ambiguous_sequence(read.template_length)
         sam.write(read)
 
 
@@ -193,8 +201,12 @@ def generate_paired_end(exp: Experiment, opt: DataGenOpt, lb: LibraryBuilder, sa
     for i in range(opt.read_number):
         read_1.query_sequence = get_read_sequence(regions_1)
         read_1.template_length = len(read_1.query_sequence)
+        if opt.read_mismatch_fraction > 0.0 and random.random() < opt.read_mismatch_fraction:
+            read_1.query_sequence = get_ambiguous_sequence(read_1.template_length)
         read_2.query_sequence = get_read_sequence(regions_2)
         read_2.template_length = len(read_2.query_sequence)
+        if opt.read_mismatch_fraction > 0.0 and random.random() < opt.read_mismatch_fraction:
+            read_2.query_sequence = get_ambiguous_sequence(read_2.template_length)
         sam.write(read_1)
         sam.write(read_2)
 
@@ -241,15 +253,23 @@ if __name__ == '__main__':
     p = ArgumentParser(description="Generate synthetic CRISPR data from a LUCA configuration")
     p.add_argument('-o', '--output', required=True, help="Output BAM file path")
     p.add_argument('-n', '--number', required=True, type=int, help="Number of reads or read pairs")
+    p.add_argument('-M', '--mismatch-fraction', type=float, default=0.0, help="Mismatching read fraction")
     p.add_argument('-s', '--seed', type=int, help="Random seed for reproducible generation")
     p.add_argument('-l', '--library-dir', help="LUCA library directory path")
     p.add_argument('-m', '--manifest', help="LUCA input manifest file path")
     p.add_argument('experiment', help="LUCA experiment configuration file path")
     args = p.parse_args()
 
-    opt = DataGenOpt(read_number=args.number, read_length=60)
+    opt = DataGenOpt(
+        read_number=args.number,
+        read_mismatch_fraction=args.mismatch_fraction,
+        read_length=60)
+
     if opt.read_number <= 0:
         sys.exit("Invalid read number!")
+
+    if opt.read_mismatch_fraction < 0.0 or opt.read_mismatch_fraction > 1.0:
+        sys.exit("Invalid mismatching read fraction!")
 
     if not os.path.isfile(args.experiment):
         sys.exit(f"File not found: '{args.experiment}'!")
