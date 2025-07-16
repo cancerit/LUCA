@@ -1,0 +1,1 @@
+{"sequencing_type":"single_end","libraries":[],"read_templates":[],"read_groups":null,"read_group_templates":{},"combinations":null,"default_options":{"test_swaps":false,"full_match_info":false,"out_mm_match_info":false,"out_mm_reads":false,"rc_reverse":false,"count_mm_reads":false,"sort_mm_read_counts":false,"compress_mm_read_counts":false}}

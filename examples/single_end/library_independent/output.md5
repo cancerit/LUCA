@@ -1,0 +1,4 @@
+523caed0fcb1f750b36aad7a917cfa44  ./single_end/library_independent/output/exp.json
+a5baa68b569b7cf047efacdee0cac461  ./single_end/library_independent/output/manifest.json
+9e49c261ea302c6b9ddd79e4393a9731  ./single_end/library_independent/output/read.counts.tsv
+6399ac5bf7d88932bb0a2c7b6d02dc5b  ./single_end/library_independent/output/stats.json
