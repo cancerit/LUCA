@@ -135,28 +135,32 @@ def get_region_max_length(region: ReadRegion, library_indices: dict[str, int], l
         raise Exception("Invalid region!")
 
 
-def get_regions(exp: Experiment, lb: LibraryBuilder, rid: ReadGroupId) -> list[GenRegion]:
+def get_regions(opt: DataGenOpt, exp: Experiment, lb: LibraryBuilder, rid: ReadGroupId) -> list[GenRegion]:
     library_indices = exp.library_indices
 
-    tpl = exp.get_read_group_templates(rid)[0]
-    regions = [
-        GenRegion(
-            prefix=region.skip * 'N',
-            length=region.length or 0,
-            libraries=[
-                lb.libraries[library_indices[library_id]]
-                for library_id in region.libraries
-            ])
-        for region in tpl.regions
-    ]
+    if exp.read_group_templates:
+        tpl = exp.get_read_group_templates(rid)[0]
+        regions = [
+            GenRegion(
+                prefix=region.skip * 'N',
+                length=region.length or 0,
+                libraries=[
+                    lb.libraries[library_indices[library_id]]
+                    for library_id in region.libraries
+                ])
+            for region in tpl.regions
+        ]
 
-    # Handle unbound last region
-    # TODO: consider whether this is worth it
-    if not regions[-1].length and not regions[-1].libraries:
-        max_length: int = 0
-        for region in tpl.regions:
-            max_length += get_region_max_length(region, library_indices, lb)
-        regions[-1].length = opt.read_length - max_length
+        # Handle unbound last region
+        # TODO: consider whether this is worth it
+        if not regions[-1].length and not regions[-1].libraries:
+            max_length: int = 0
+            for region in tpl.regions[:-1]:
+                max_length += get_region_max_length(region, library_indices, lb)
+            regions[-1].length = opt.read_length - max_length
+
+    else:
+        regions = [GenRegion(prefix='', length=opt.read_length, libraries=[])]        
 
     return regions
 
@@ -181,7 +185,7 @@ def get_read_sequence(regions: list[GenRegion]) -> str:
 
 
 def generate_single_end(exp: Experiment, opt: DataGenOpt, lb: LibraryBuilder, sam: AlignmentFile):
-    regions = get_regions(exp, lb, ReadGroupId.DEFAULT)
+    regions = get_regions(opt, exp, lb, ReadGroupId.DEFAULT)
 
     read = get_read()
     # read.template_length = opt.read_length
@@ -194,8 +198,8 @@ def generate_single_end(exp: Experiment, opt: DataGenOpt, lb: LibraryBuilder, sa
 
 
 def generate_paired_end(exp: Experiment, opt: DataGenOpt, lb: LibraryBuilder, sam: AlignmentFile):
-    regions_1 = get_regions(exp, lb, ReadGroupId.READ_1)
-    regions_2 = get_regions(exp, lb, ReadGroupId.READ_2)
+    regions_1 = get_regions(opt, exp, lb, ReadGroupId.READ_1)
+    regions_2 = get_regions(opt, exp, lb, ReadGroupId.READ_2)
 
     read_1, read_2 = get_read_pair()
     for i in range(opt.read_number):
@@ -219,9 +223,6 @@ def main(opt: DataGenOpt, exp: Experiment, out_fp: str, pb: PathBundle, seed: in
         lb = library_builder_from_experiment(exp, pb)
     except TsvError as ex:
         abort("Invalid TSV file: '%s'!" % ex.fp)
-
-    if not lb.libraries:
-        raise NotImplementedError("Library-independent!")
 
     for templates in exp.read_group_templates.values():
         if len(templates) > 1:
@@ -253,6 +254,7 @@ if __name__ == '__main__':
     p = ArgumentParser(description="Generate synthetic CRISPR data from a LUCA configuration")
     p.add_argument('-o', '--output', required=True, help="Output BAM file path")
     p.add_argument('-n', '--number', required=True, type=int, help="Number of reads or read pairs")
+    p.add_argument('-r', '--read-length', required=True, type=int, help="Read length")
     p.add_argument('-M', '--mismatch-fraction', type=float, default=0.0, help="Mismatching read fraction")
     p.add_argument('-s', '--seed', type=int, help="Random seed for reproducible generation")
     p.add_argument('-l', '--library-dir', help="LUCA library directory path")
@@ -263,7 +265,7 @@ if __name__ == '__main__':
     opt = DataGenOpt(
         read_number=args.number,
         read_mismatch_fraction=args.mismatch_fraction,
-        read_length=60)
+        read_length=args.read_length)
 
     if opt.read_number <= 0:
         sys.exit("Invalid read number!")
