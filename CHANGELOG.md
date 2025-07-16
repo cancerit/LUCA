@@ -6,6 +6,7 @@
 
 - Fix library stats serialisation for NumPy 2.3.*
 - Fix ambiguous (non-canonical) base pattern
+- Fix error message formatting on invalid combination configuration
 - Handle input manifest failed look-ups
 - Handle invalid DNA sequence errors
 
