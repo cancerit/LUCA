@@ -1,0 +1,10 @@
+a4a21762484f08f3c4ac97c33e60a29d  ./paired_end/dual_guide/filtered_and_unfiltered/output/combination.0.counts.tsv
+9146ec0f706a609537ac201a9960bebf  ./paired_end/dual_guide/filtered_and_unfiltered/output/combination.1.counts.tsv
+2ed0b867e98a6b68233e17a955dd35f0  ./paired_end/dual_guide/filtered_and_unfiltered/output/exp.json
+d9e618e1981f142776ab47abe66825b0  ./paired_end/dual_guide/filtered_and_unfiltered/output/exp.stats.json
+923c4e2891fcf1db9232a64362dc7a5b  ./paired_end/dual_guide/filtered_and_unfiltered/output/lib.0.counts.tsv
+48cd668a095bdbebee625a4e9738a9ea  ./paired_end/dual_guide/filtered_and_unfiltered/output/lib.0.stats.json
+b6545a7a0a4d982532e274f9e67e8c5e  ./paired_end/dual_guide/filtered_and_unfiltered/output/lib.1.counts.tsv
+37478b67358c17e3395d1cedc37cf356  ./paired_end/dual_guide/filtered_and_unfiltered/output/lib.1.stats.json
+48181332b7907d0be884ad9ac531c7f3  ./paired_end/dual_guide/filtered_and_unfiltered/output/manifest.json
+0c5f4df72eba98f31ece5d6ed78af154  ./paired_end/dual_guide/filtered_and_unfiltered/output/stats.json
