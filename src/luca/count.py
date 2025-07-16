@@ -34,7 +34,7 @@ from . import __version__
 from .app_info import AppInfo
 from .cli import common_cli_debug_options, common_cli_options, debug_opts
 from .cli_utils import abort, existing_directory_path, existing_file_path
-from .errors import InvalidExperiment, InvalidHTSError, InvalidLibraryError, InvalidReadFileExtension, MissingMetadataError, TargetNotFound
+from .errors import InputReadError, InvalidExperiment, InvalidHTSError, InvalidLibraryError, InvalidReadFileExtension, MissingMetadataError, TargetNotFound
 from .experiment import Experiment, Options, ReadGroupId, SequencingType
 from .fs import get_read_counts_file_name
 from .input_manifest import InputManifest
@@ -358,6 +358,10 @@ def count(
         sys.exit(1)
 
     except InvalidHTSError as ex:
+        logging.error(ex.message)
+        sys.exit(1)
+
+    except InputReadError as ex:
         logging.error(ex.message)
         sys.exit(1)
 
