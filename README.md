@@ -59,7 +59,7 @@ The tool requires at least a BAM or CRAM file containing the reads to process, a
 Input files:
 
 - reads (BAM/CRAM)
-- [experiment metadata](#experiment) (YAML)
+- [experiment metadata](#experiment) (YAML or JSON)
 - [libraries](#library) (TSV)
 
 Output files:
