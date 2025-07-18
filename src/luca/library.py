@@ -24,6 +24,7 @@ import gc
 import logging
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
+import os
 from typing import Any, Sized
 
 import numpy as np
@@ -346,6 +347,8 @@ class RawLibrary(Sized):
 
     @classmethod
     def load(cls, fp: str, index: int, reverse_on: LibraryReverseCondition):
+        assert os.path.isfile(fp)
+
         try:
             sequences = list(map(lambda r: r[0], parse_tsv(fp, LIBRARY_FIELDS)))
 

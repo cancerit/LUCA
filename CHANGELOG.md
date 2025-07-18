@@ -10,6 +10,7 @@
 - Handle input manifest failed look-ups
 - Handle invalid DNA sequence errors
 - Reject empty target sequences in libraries
+- Detect encoding when loading data from TSV files
 
 ### Changed
 
