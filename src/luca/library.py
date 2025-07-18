@@ -308,6 +308,9 @@ class RawLibrary(Sized):
 
         # Check for invalid targets
         for target in self.sequences:
+            if len(target) == 0:
+                raise InvalidLibraryError(
+                    f"Empty target sequence in library {self.src}!")
             if not is_dna(target):
                 raise InvalidLibraryError(
                     f"Invalid target '{target}' in library {self.src}!")

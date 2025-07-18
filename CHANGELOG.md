@@ -9,6 +9,7 @@
 - Fix error message formatting on invalid combination configuration
 - Handle input manifest failed look-ups
 - Handle invalid DNA sequence errors
+- Reject empty target sequences in libraries
 
 ### Changed
 
