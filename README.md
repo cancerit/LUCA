@@ -16,6 +16,8 @@ Non-goals:
 - support for redundant or overlapping libraries
 - support for alternate formats for the input files (*e.g.*, libraries)
 
+Please refer to the [examples](examples/) directory for some usage scenarios.
+
 ## Table of contents
 
 - [Locus-based Universal CRISPR Aligner (LUCA)](#locus-based-universal-crispr-aligner-luca)
