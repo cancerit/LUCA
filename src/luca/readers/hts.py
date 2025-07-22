@@ -151,9 +151,6 @@ def iter_single_end(exclude_qcfail: bool, skip_read_flag: int, rc_reverse: bool,
 
 
 def iter_paired_end(exclude_qcfail: bool, skip_read_flag: int, rc_reverse: bool, has_output: bool, stats: LibraryIndependentStats, sam: pysam.AlignmentFile, out_bam: pysam.AlignmentFile | None, n: int | None) -> Generator[tuple[str, str], tuple[bool, bool], None]:
-    if rc_reverse:
-        raise NotImplementedError("Forcing reverse complement not yet defined for paired-end sequencing data!")
-
     read_1: str = ''
     read_2: str = ''
 

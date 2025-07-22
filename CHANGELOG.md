@@ -15,6 +15,7 @@
 ### Changed
 
 - Forbid extra attributes in the experiment configuration
+- Enable `rc_reverse` option for paired-end data
 
 ## [1.0.1] - 2025-04-07
 

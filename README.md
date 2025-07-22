@@ -312,7 +312,7 @@ Sequence of regions with a DNA sequence that are expected to match a target sequ
 |`anchor`|`auto`\|`left`\|`right`|`auto`|Direction in which the regions are expected to be found.|
 |`regions`|[region](#region) array||Regions.|
 
-When setting `anchor` to `auto`, the regions are matched from the left in reads belonging to a forward group, and from the right in reads belonging to a reverse group. Currently, the read sequence is considered as stored in the BAM/CRAM file unless `rc_reverse` is set (only valid in single-end mode); mapping may affect the orientation of the query sequence.
+When setting `anchor` to `auto`, the regions are matched from the left in reads belonging to a forward group, and from the right in reads belonging to a reverse group. By default, the read sequence is considered as stored in the BAM/CRAM file; for mapped data, the `rc_reverse` option can be set to ensure all sequences are converted to forward before matching.
 
 ##### Region
 
@@ -407,7 +407,7 @@ Combinations may be filtered by passing inclusion lists via files (`filters` pro
 |`count_mm_reads`|Boolean|`false`|Whether to count the mismatching reads (as in library-independent counting).|
 |`sort_mm_read_counts`|Boolean|`false`|Whether to sort mismatching read counts (in descending order), if calculated.|
 |`compress_mm_read_counts`|Boolean|`false`|Whether to compress the counts of the mismatching reads, if calculated.|
-|`rc_reverse`|Boolean|`false`|Whether to apply the reverse complement to reverse reads before matching (currently for single-end only).|
+|`rc_reverse`|Boolean|`false`|Whether to apply the reverse complement to reverse reads before matching.|
 
 #### Experiment statistics
 
