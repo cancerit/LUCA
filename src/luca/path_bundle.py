@@ -1,6 +1,6 @@
 # LUCA
 #
-# Copyright (C) 2024 Genome Research Ltd.
+# Copyright (C) 2024, 2025 Genome Research Ltd.
 #
 # Author: Luca Barbon
 #
@@ -30,7 +30,7 @@ class PathBundle:
     input_manifest: InputManifest | None
 
     def get_library_file_path(self, id: str) -> str:
-        if self.input_manifest and self.input_manifest.libraries:
+        if self.input_manifest and id in self.input_manifest.libraries:
             return self.input_manifest.get_library_file_path(id, root_dir=self.library_dir)
         elif self.library_dir:
             return os.path.join(self.library_dir, id)
@@ -38,7 +38,7 @@ class PathBundle:
             return id
 
     def get_combination_filter_file_path(self, id: str) -> str:
-        if self.input_manifest and self.input_manifest.combination_filters:
+        if self.input_manifest and id in self.input_manifest.combination_filters:
             return self.input_manifest.get_combination_filter_file_path(id, root_dir=self.library_dir)
         elif self.library_dir:
             return os.path.join(self.library_dir, id)

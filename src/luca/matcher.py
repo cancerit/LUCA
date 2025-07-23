@@ -639,6 +639,7 @@ def build_combination_filter(
     assert field_names
     for ft in config.filters:
         fp = pb.get_combination_filter_file_path(ft)
+        assert os.path.isfile(fp)
         # NOTE: this is favouring the configuration order vs the TSV order
         for sequences in parse_tsv(fp, field_names):
             combinations.add(tuple([

@@ -1,6 +1,6 @@
 # LUCA
 #
-# Copyright (C) 2024 Genome Research Ltd.
+# Copyright (C) 2024, 2025 Genome Research Ltd.
 #
 # Author: Luca Barbon
 #
@@ -23,7 +23,7 @@ from enum import Enum, IntEnum
 from itertools import chain, groupby
 from typing import Any
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from .errors import InvalidExperiment
 from .utils import eval_fail_conditions, get_offsets, get_set, greedy_all, greedy_any, has_duplicates, union
@@ -49,7 +49,11 @@ class LibraryReverseCondition(Enum):
     NEVER = 'never'
 
 
-class LibraryInfo(BaseModel):
+class BaseConfig(BaseModel, validate_assignment=True):
+    model_config = ConfigDict(extra='forbid')  # noqa: F841
+
+
+class LibraryInfo(BaseConfig):
     id: str
     values: list[str] | None = None
     reverse_on: LibraryReverseCondition = LibraryReverseCondition.REVERSE_GROUP
@@ -59,7 +63,7 @@ class LibraryInfo(BaseModel):
         return not bool(self.values)
 
 
-class ReadRegion(BaseModel):
+class ReadRegion(BaseConfig):
     id: str
     libraries: list[str] = list()
     skip: int = 0
@@ -80,7 +84,18 @@ class ReadRegion(BaseModel):
             "Invalid read region '%s' in read template '%s': %s!" %
             (self.id, tpl_id, msg))
 
-    def validate(self, tpl_id: str) -> bool:
+    def validate_libraries(self, library_ids: set[str]) -> bool:
+        region_libraries: set[str] = set(self.libraries) | set(self.swap_libraries)
+        missing_libraries: set[str] = region_libraries - library_ids
+        if missing_libraries:
+            for library_id in missing_libraries:
+                logging.error(
+                    "Unknown library ID in region '%s': '%s'!" %
+                    (self.id, library_id))
+            return False
+        return True
+
+    def validate(self, library_ids: set[str], tpl_id: str) -> bool:
         return eval_fail_conditions([
             (
                 (self.is_library_indep and bool(self.swap_libraries)),
@@ -93,6 +108,10 @@ class ReadRegion(BaseModel):
             (
                 ((self.length is not None or self.is_library_indep) and self.max_offset != 0),
                 "library-independent quantification does not support a nonzero maximum offset"
+            ),
+            (
+                (not self.validate_libraries(library_ids)),
+                "unknown library ID's"
             )
         ], lambda msg: self._raise_invalid_region(tpl_id, msg))
 
@@ -125,7 +144,7 @@ class Anchor(Enum):
 CombinationRegionIndices = dict[ReadGroupId, list[dict[str, int]]]
 
 
-class ReadTemplate(BaseModel):
+class ReadTemplate(BaseConfig):
     #  NOTE: Have reverse complement be a property
     #   of the template, for maximum flexibility
     #  (when both orientation are to be evaluated);
@@ -164,15 +183,15 @@ class ReadTemplate(BaseModel):
     def get_region_indices(self, offset: int = 0) -> dict[str, int]:
         return {r.id: offset + i for i, r in enumerate(self.regions)}
 
-    def validate(self) -> bool:
-        return greedy_all(lambda x: x.validate(self.id), self.regions)
+    def validate(self, library_ids: set[str]) -> bool:
+        return greedy_all(lambda x: x.validate(library_ids, self.id), self.regions)
 
 
-class ReadGroupOptions(BaseModel):
+class ReadGroupOptions(BaseConfig):
     is_reverse: bool
 
 
-class ReadGroupInfo(BaseModel):
+class ReadGroupInfo(BaseConfig):
     """
     Information to classify reads in order to match them to templates
 
@@ -187,7 +206,7 @@ class ReadGroupInfo(BaseModel):
         self.is_reverse = opt.is_reverse
 
 
-class CombinationRegion(BaseModel):
+class CombinationRegion(BaseConfig):
     id: str
     read_group: ReadGroupId = ReadGroupId.DEFAULT
     filter: bool = False
@@ -200,7 +219,7 @@ class CombinationRegion(BaseModel):
         )
 
 
-class CombinationInfo(BaseModel):
+class CombinationInfo(BaseConfig):
     id: str
     regions: list[CombinationRegion]
     filters: list[str] | None = None
@@ -284,7 +303,7 @@ READ_GROUP_INFOS = {
 }
 
 
-class Options(BaseModel):
+class Options(BaseConfig):
     """
     Runtime options
 
@@ -339,7 +358,7 @@ def get_unique_library_ids_from_read_templates(read_templates: list[ReadTemplate
     return union(library_ids) if library_ids else set()
 
 
-class Experiment(BaseModel):
+class Experiment(BaseConfig):
     # TODO: include species and assembly?
     sequencing_type: SequencingType
     libraries: list[LibraryInfo] = Field(default_factory=list)
@@ -366,6 +385,10 @@ class Experiment(BaseModel):
     @property
     def template_ids(self) -> list[str]:
         return [tpl.id for tpl in self.read_templates]
+
+    @property
+    def library_ids(self) -> set[str]:
+        return {library.id for library in self.libraries}
 
     @model_validator(mode='after')
     def _validate(self):
@@ -394,7 +417,7 @@ class Experiment(BaseModel):
                 if had_duplicates:
                     success = False
 
-                if not greedy_all(lambda x: x.validate(), self.read_templates):
+                if not greedy_all(lambda x: x.validate(self.library_ids), self.read_templates):
                     success = False
 
                 if self.read_group_templates:
@@ -434,6 +457,15 @@ class Experiment(BaseModel):
                     }
 
                     for cr in self.combinations:
+                        read_group_ids: set[ReadGroupId] = {
+                            region.read_group
+                            for region in cr.regions
+                        }
+                        for id in read_group_ids:
+                            if id not in self.read_group_templates:
+                                logging.error("Read group '%s' in combination '%s' not assigned to any read template!" % (id.value, cr.id))
+                                success = False
+
                         filtered_region_ids = set([
                             region.id
                             for region in cr.filtered_regions
@@ -441,8 +473,8 @@ class Experiment(BaseModel):
                         if cr.has_filter:
                             if not filtered_region_ids:
                                 logging.error(
-                                    "Combination %s has inclusion filters assigned to it " +
-                                    "but none of its regions are marked as filtering!" % cr.id)
+                                    "Combination %s has inclusion filters assigned to it " % cr.id +
+                                    "but none of its regions are marked as filtering!")
                                 success = False
                         else:
                             if filtered_region_ids:

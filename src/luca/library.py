@@ -1,6 +1,6 @@
 # LUCA
 #
-# Copyright (C) 2024 Genome Research Ltd.
+# Copyright (C) 2024, 2025 Genome Research Ltd.
 #
 # Author: Luca Barbon
 #
@@ -24,6 +24,7 @@ import gc
 import logging
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
+import os
 from typing import Any, Sized
 
 import numpy as np
@@ -308,6 +309,9 @@ class RawLibrary(Sized):
 
         # Check for invalid targets
         for target in self.sequences:
+            if len(target) == 0:
+                raise InvalidLibraryError(
+                    f"Empty target sequence in library {self.src}!")
             if not is_dna(target):
                 raise InvalidLibraryError(
                     f"Invalid target '{target}' in library {self.src}!")
@@ -343,6 +347,8 @@ class RawLibrary(Sized):
 
     @classmethod
     def load(cls, fp: str, index: int, reverse_on: LibraryReverseCondition):
+        assert os.path.isfile(fp)
+
         try:
             sequences = list(map(lambda r: r[0], parse_tsv(fp, LIBRARY_FIELDS)))
 
@@ -535,12 +541,12 @@ def fill_library_stats(stats: LibraryStats, template_counts: np.ndarray) -> None
 
     # Count templates with low read counts
     # TODO: take better advantage of the sorting...?
-    low_counts[0] = np.count_nonzero(template_counts == 0)
+    low_counts[0] = int(np.count_nonzero(template_counts == 0))
     count_thresholds: list[int] = [15, 30]
     # if opt.custom_count_threshold is not None:
     #     count_thresholds.append(opt.custom_count_threshold)
     for t in count_thresholds:
-        low_counts[t] = np.count_nonzero(template_counts < t)
+        low_counts[t] = int(np.count_nonzero(template_counts < t))
 
     # Generate all stats
     mapped_to_template_reads, mean_count_per_template, median_count_per_template, gini_coefficient = get_stats(

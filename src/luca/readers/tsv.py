@@ -22,6 +22,7 @@ from typing import Generator
 
 from ..fs import open_input_file
 from ..utils import has_duplicates
+from .utils import detect_encoding
 
 
 class TsvError(Exception):
@@ -63,7 +64,7 @@ def parse_tsv_at(fp: str, indices: list[int]) -> Generator[list[str], None, None
 
 def parse_tsv(fp: str, fields: list[str]) -> Generator[list[str], None, None]:
     assert not has_duplicates(fields)
-    with open(fp) as fh:
+    with open(fp, encoding=detect_encoding(fp)) as fh:
         reader = csv.reader(fh, delimiter='\t')
 
         try:

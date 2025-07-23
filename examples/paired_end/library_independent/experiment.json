@@ -1,0 +1,27 @@
+{
+    "sequencing_type": "paired_end",
+    "read_group_templates": {
+        "read_1": ["forward"],
+        "read_2": ["reverse"]
+    },
+    "read_templates": [
+        {
+            "id": "forward",
+            "regions": [{"id": "guide"}]
+        },
+        {
+            "id": "reverse",
+            "regions": [{"id": "guide"}]
+        }
+    ],
+    "combinations": [
+        {
+            "id": "guides",
+            "regions": [
+                {"read_group": "read_1", "id": "guide"},
+                {"read_group": "read_2", "id": "guide"}
+            ]
+        }
+    ],
+    "default_options": {}
+}

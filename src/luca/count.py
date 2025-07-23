@@ -1,6 +1,6 @@
 # LUCA
 #
-# Copyright (C) 2023, 2024 Genome Research Ltd.
+# Copyright (C) 2023, 2024, 2025 Genome Research Ltd.
 #
 # Author: Luca Barbon
 #
@@ -27,13 +27,14 @@ import click
 import yaml
 from click_option_group import OptionGroup
 from pydantic import ValidationError
+from yaml.parser import ParserError
 from yaml.scanner import ScannerError
 
 from . import __version__
 from .app_info import AppInfo
 from .cli import common_cli_debug_options, common_cli_options, debug_opts
 from .cli_utils import abort, existing_directory_path, existing_file_path
-from .errors import InvalidExperiment, InvalidLibraryError, InvalidReadFileExtension, MissingMetadataError, TargetNotFound
+from .errors import InputReadError, InvalidExperiment, InvalidHTSError, InvalidLibraryError, InvalidReadFileExtension, MissingMetadataError, TargetNotFound
 from .experiment import Experiment, Options, ReadGroupId, SequencingType
 from .fs import get_read_counts_file_name
 from .input_manifest import InputManifest
@@ -43,6 +44,7 @@ from .matcher import ExperimentStats, MultiMatcher, get_multi_matcher
 from .path_bundle import PathBundle
 from .readers.main import parse_reads
 from .readers.read_file_info import ReadFileInfo
+from .readers.tsv import TsvError
 from .stats import LibraryIndependentStats
 from .utils import load_text_from_file, log_validation_error
 from .writer import write_stats
@@ -92,6 +94,8 @@ def load_matcher(exp: Experiment, pb: PathBundle) -> MultiMatcher:
         abort("File not found: '%s'!", ex.filename or ex.args[0])
     except InvalidLibraryError as ex:
         abort(ex.message)
+    except TsvError as ex:
+        abort("Invalid TSV file: '%s'!" % ex.fp)
 
 
 def library_dependent_counting(exp: Experiment, opt: Options, pb: PathBundle, iter_reads, profile: bool = False) -> tuple[LibraryIndependentStats, ExperimentStats]:
@@ -261,6 +265,9 @@ def count(
         except ScannerError as ex:
             m = ex.problem_mark
             abort(f"YAML parsing error: {ex.problem} at line {m.line} column {m.column} in {m.name}!")  # type: ignore
+        except ParserError as ex:
+            logging.error(str(ex).replace('\n', ''))
+            abort("Failed to load experiment configuration!")
         except ValidationError as ex:
             log_validation_error(ex)
             abort("Failed to load experiment configuration!")
@@ -349,6 +356,17 @@ def count(
     except MissingMetadataError as ex:
         logging.error(ex.message)
         sys.exit(1)
+
+    except InvalidHTSError as ex:
+        logging.error(ex.message)
+        sys.exit(1)
+
+    except InputReadError as ex:
+        logging.error(ex.message)
+        sys.exit(1)
+
+    except TsvError as ex:
+        abort("Invalid TSV file: '%s'!" % ex.fp)
 
     # Write stats to file
     assert stats

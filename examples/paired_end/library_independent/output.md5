@@ -1,0 +1,6 @@
+c62c27fd70b5be9f4550bba2a3cd1ffc  ./paired_end/library_independent/output/combination.0.counts.tsv
+aa2ada26aed75721659bc32cd56de94f  ./paired_end/library_independent/output/exp.json
+f0d935a732a81405011b236aef7915c3  ./paired_end/library_independent/output/exp.stats.json
+dfa739d181b3690e548e9e951f576569  ./paired_end/library_independent/output/lib.0.counts.tsv
+038d4db973527577995862ebfc1d50f5  ./paired_end/library_independent/output/manifest.json
+f2ae0c7b7debfa2b77058a5dfcaf54c3  ./paired_end/library_independent/output/stats.json

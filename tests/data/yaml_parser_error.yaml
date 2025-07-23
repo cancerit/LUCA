@@ -1,0 +1,21 @@
+{
+"sequencing_type": "single_end",
+  "libraries": [
+    {"id": "lib.tsv"}
+  ],
+"read_group_templates": {
+        "default": ["default"]
+    },
+"read_templates": [
+        {
+            "id": "default",
+            "regions": [
+                {
+                    "id": "guide",<PARSER_ERROR>
+                    "libraries": ["lib.tsv"]
+                }
+            ]
+        }
+    ],
+    "default_options": {}
+}

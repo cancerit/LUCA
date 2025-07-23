@@ -1,0 +1,32 @@
+{
+    "sequencing_type": "paired_end",
+    "read_group_templates": {
+        "read_1": ["forward"],
+        "read_2": ["reverse"]
+    },
+    "libraries": [
+        {"id": "guide_1_library", "reverse_on": "never"},
+        {"id": "guide_2_library", "reverse_on": "never"}
+    ],
+    "read_templates": [
+        {
+            "id": "forward",
+            "regions": [{"id": "guide", "libraries": ["guide_1_library"]}]
+        },
+        {
+            "id": "reverse",
+            "regions": [{"id": "guide", "libraries": ["guide_2_library"]}]
+        }
+    ],
+    "combinations": [
+        {
+            "id": "guides",
+            "regions": [
+                {"read_group": "read_1", "id": "guide", "filter": true},
+                {"read_group": "read_2", "id": "guide", "filter": true}
+            ],
+            "filters": ["paired_end_dual_guide_pair_filter"]
+        }
+    ],
+    "default_options": {}
+}

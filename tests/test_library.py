@@ -17,9 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from tempfile import NamedTemporaryFile
+
 import pytest
 
 from luca.errors import InvalidLibraryError
+from luca.experiment import LibraryReverseCondition
 from luca.library import DynamicMultiTargetLibrary, LibraryBuilder, MonoTargetLibrary, \
     MultiTargetLibrary, \
     MultiTargetUniformLibrary, RawLibrary
@@ -146,3 +149,16 @@ def test_library_builder_shared_targets():
 def test_raw_library(sequences):
     with pytest.raises(InvalidLibraryError):
         RawLibrary(0, False, sequences)
+
+
+def test_raw_library_load_empty_sequence():
+    with NamedTemporaryFile() as tmp:
+
+        # Library with one empty sequence
+        with open(tmp.name, 'w') as fh:
+            fh.write("id\tsequence\n")
+            fh.write("0\tAAA\n")
+            fh.write("1\t\n")
+
+        with pytest.raises(InvalidLibraryError):
+            RawLibrary.load(tmp.name, 0, LibraryReverseCondition.NEVER)

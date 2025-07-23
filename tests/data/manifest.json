@@ -1,0 +1,9 @@
+{
+    "libraries": {
+        "guide_1_library": "library_1.tsv",
+        "guide_2_library": "library_2.tsv"
+    },
+    "combination_filters": {
+        "combination_filter": "combination_filter_truncated.tsv"
+    }
+}
